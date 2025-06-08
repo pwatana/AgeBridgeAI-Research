@@ -1,6 +1,6 @@
 data:
-  train_csv: data/training/hand/boneage-training-dataset.csv
-  image_dir: data/training/hand/boneage-training-dataset
+  train_csv: data/training/boneage-training-dataset.csv
+  image_dir: data/training/boneage-training-dataset
 
 training:
   image_size: [224, 224]
