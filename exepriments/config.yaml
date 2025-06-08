@@ -1,0 +1,10 @@
+data:
+  train_csv: data/training/hand/boneage-training-dataset.csv
+  image_dir: data/training/hand/boneage-training-dataset
+
+training:
+  image_size: [224, 224]
+  batch_size: 32
+  seed: 42
+  num_classes: 3
+  grayscale: true

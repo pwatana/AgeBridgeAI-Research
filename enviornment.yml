@@ -1,0 +1,31 @@
+name: Rheumatoid Arthritis
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - tensorflow=2.15
+  - keras
+  - pandas
+  - numpy
+  - scikit-learn
+  - opencv
+  - pillow
+  - matplotlib
+  - seaborn
+  - tensorboard
+  - pyyaml
+  - tqdm
+  - imageio
+  - tifffile
+  - pydicom
+  - SimpleITK
+  - notebook
+  - jupyterlab
+  - pytest
+  - flake8
+  - black
+  - pip
+  - pip:
+      - albumentations
+      - medpy  
