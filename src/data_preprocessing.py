@@ -13,10 +13,6 @@ class Preprocessor:
 
     @staticmethod
     def _load_image(file_path):
-        """
-        Loads an image from the given file path (JPG or PNG).
-        Converts to grayscale and returns as a NumPy array (float32).
-        """
         _, ext = os.path.splitext(file_path)
         ext = ext.lower()
 
@@ -34,10 +30,6 @@ class Preprocessor:
 
     @staticmethod
     def _normalize_image(image, target_range=(0, 255)):
-        """
-        Normalizes pixel intensities to a target range (e.g., 0-255 or 0-1).
-        Assumes input image is float32.
-        """
         if image is None:
             return None
 
@@ -52,11 +44,8 @@ class Preprocessor:
         return normalized_image.astype(np.float32)
 
     @staticmethod
-    def _apply_clahe(image, clip_limit=2.0, tile_grid_size=(8, 8)):
-        """
-        Applies Contrast Limited Adaptive Histogram Equalization (CLAHE).
-        Input image should be 8-bit (0-255).
-        """
+    def _apply_clahe(image, clip_limit=2.0, tile_grid_size=(8, 8)): # Contrast Limited Adaptive Histogram Equalization
+        # Input image 8-bit (0-255)
         if image is None:
             return None
         
@@ -67,43 +56,26 @@ class Preprocessor:
         return clahe_image.astype(np.float32)
 
     @staticmethod
-    def _apply_gaussian_denoising(image, kernel_size=(3, 3)):
-        """
-        Applies Gaussian blurring for denoising.
-        kernel_size should be odd (e.g., (3,3), (5,5)).
-        """
+    def _apply_gaussian_denoising(image, kernel_size=(3, 3)): # Gaussian blurring, kernel_size should be odd (3,3), (5,5)
         if image is None:
             return None
         return cv2.GaussianBlur(image, kernel_size, 0).astype(np.float32)
 
     @staticmethod
-    def _resize_image(image, target_size=(512, 512)):
-        """
-        Resizes an image to the target dimensions using cubic interpolation.
-        """
+    def _resize_image(image, target_size=(512, 512)): # cubic interpolation
         if image is None:
             return None
         return cv2.resize(image, target_size, interpolation=cv2.INTER_CUBIC).astype(np.float32)
 
     @staticmethod
-    def _segment_hand(image):
-        """
-        Placeholder for Hand Region Segmentation.
-        Returns:
-            segmented_image (np.ndarray): The hand region cropped/masked, or the original
-                                         image if segmentation is skipped/failed.
-            hand_mask (np.ndarray): A binary mask of the hand region, if segmentation occurs.
-        """
+    def _segment_hand(image): # Placeholder for hand region segmentation
         print("--- INFO: Placeholder for Hand Region Segmentation. ---")
         print("   A dedicated U-Net model trained on X-ray hand masks would go here.")
         print("   Returning original image for now, and a dummy full mask.")
         
         return image, np.ones_like(image, dtype=np.uint8) * 255
 
-    def process_image(self, file_path, output_dir):
-        """
-        Orchestrates the preprocessing pipeline for a single image.
-        """
+    def process_image(self, file_path, output_dir): # pipeline preprocessing
         os.makedirs(output_dir, exist_ok=True)
         base_name = os.path.basename(file_path).split('.')[0]
         output_path = os.path.join(output_dir, f"{base_name}_preprocessed.png")
