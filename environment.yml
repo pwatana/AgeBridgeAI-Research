@@ -9,7 +9,7 @@ dependencies:
   - pandas
   - numpy
   - scikit-learn
-  - opencv
+  - opencv 
   - pillow
   - matplotlib
   - seaborn
@@ -18,14 +18,16 @@ dependencies:
   - tqdm
   - imageio
   - tifffile
-  - pydicom
-  - SimpleITK
+  - pydicom 
+  - simpleitk 
   - notebook
   - jupyterlab
   - pytest
   - flake8
   - black
   - pip
+  - scikit-image 
   - pip:
       - albumentations
-      - medpy  
+      - medpy
+      - ultralytics # ensure this is recent enough for YOLOv8
