@@ -6,6 +6,7 @@ import numpy as np
 from skimage.util import img_as_ubyte
 from PIL import Image 
 import yaml 
+import argparse
 
 class Preprocessor:
     def __init__(self, config):
@@ -45,16 +46,20 @@ class Preprocessor:
 
     @staticmethod
     def _apply_clahe(image, clip_limit=2.0, tile_grid_size=(8, 8)): # Contrast Limited Adaptive Histogram Equalization
-        # Input image 8-bit (0-255)
+        # Input image should be float, will be converted to 8-bit (0-255) by img_as_ubyte
         if image is None:
             return None
         
-        image_8bit = img_as_ubyte(Preprocessor._normalize_image(image, target_range=(0, 255))) 
+        # Normalize the image to [0, 1] range first for img_as_ubyte
+        image_normalized_0_1 = Preprocessor._normalize_image(image, target_range=(0.0, 1.0))
+        
+        # Now convert to 8-bit unsigned integer (0-255) using img_as_ubyte
+        image_8bit = img_as_ubyte(image_normalized_0_1) 
 
         clahe = cv2.createCLAHE(clipLimit=clip_limit, tileGridSize=tile_grid_size)
         clahe_image = clahe.apply(image_8bit)
-        return clahe_image.astype(np.float32)
-
+        return clahe_image.astype(np.float32) # Return as float32 for consistency in pipeline
+    
     @staticmethod
     def _apply_gaussian_denoising(image, kernel_size=(3, 3)): # Gaussian blurring, kernel_size should be odd (3,3), (5,5)
         if image is None:
@@ -114,21 +119,41 @@ class Preprocessor:
         return processed_image_uint8, output_path
 
 if __name__ == "__main__":
-    # --- Example Usage ---
+    # ADDED: Argument parsing setup
+    parser = argparse.ArgumentParser(description="Preprocess a medical image.")
+    parser.add_argument("--image_path", type=str,
+                        help="Path to the input image file (e.g., data/raw/my_image.png)",
+                        required=True)
+    parser.add_argument("--output_dir", type=str,
+                        help="Directory to save the preprocessed image (e.g., data/processed)",
+                        required=False, default=None)
+
+    args = parser.parse_args()
+    # END ADDED
 
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    dummy_raw_dir = os.path.join(base_dir, 'data', 'raw', 'test_images')
-    dummy_processed_dir = os.path.join(base_dir, 'data', 'processed')
+    
+    # MODIFIED: Determine output directory dynamically
+    if args.output_dir:
+        output_directory = args.output_dir
+    else:
+        # Default to data/processed within the project structure
+        output_directory = os.path.join(base_dir, 'data', 'processed')
+    # END MODIFIED
+
     config_path = os.path.join(base_dir, 'configs', 'data_config.yaml')
 
-    os.makedirs(dummy_raw_dir, exist_ok=True)
-    os.makedirs(dummy_processed_dir, exist_ok=True)
+    # MODIFIED: Use output_directory instead of a dummy one, and removed dummy_raw_dir creation
+    os.makedirs(output_directory, exist_ok=True) 
     os.makedirs(os.path.dirname(config_path), exist_ok=True)
+    # END MODIFIED
 
-    dummy_image_png = np.random.randint(0, 256, size=(300, 400), dtype=np.uint8)
-    filename_png = os.path.join(dummy_raw_dir, 'test_xray_01.png')
-    cv2.imwrite(filename_png, dummy_image_png)
-    print(f"Created dummy PNG: {filename_png}")
+    # REMOVED: Dummy image creation block (Original lines 13-16)
+    # dummy_image_png = np.random.randint(0, 256, size=(300, 400), dtype=np.uint8)
+    # filename_png = os.path.join(dummy_raw_dir, 'test_xray_01.png')
+    # cv2.imwrite(filename_png, dummy_image_png)
+    # print(f"Created dummy PNG: {filename_png}")
+    # END REMOVED
 
     if not os.path.exists(config_path):
         example_config = {
@@ -159,9 +184,14 @@ if __name__ == "__main__":
 
     preprocessor = Preprocessor(preprocessing_config)
 
-    processed_img, processed_path = preprocessor.process_image(filename_png, dummy_processed_dir)
+    # CRITICAL MODIFICATION: Use args.image_path and output_directory
+    processed_img, processed_path = preprocessor.process_image(args.image_path, output_directory)
+    # END CRITICAL MODIFICATION
 
     if processed_img is not None:
         print(f"Processed image shape: {processed_img.shape}")
-    print("\nPreprocessing pipeline completed for dummy image.")
-    print(f"Check '{dummy_processed_dir}' directory for output.")
+        # MODIFIED: Clarify which image was processed
+        print(f"\nPreprocessing pipeline completed for {args.image_path}.") 
+        print(f"Check '{output_directory}' directory for output.") 
+    else: # ADDED: else block for when processing fails
+        print(f"Preprocessing failed for {args.image_path}.")

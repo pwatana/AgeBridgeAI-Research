@@ -1,0 +1,11 @@
+normalize:
+  target_range: [0, 255]
+clahe:
+  apply: true
+  clip_limit: 2.0
+  tile_grid_size: [8, 8]
+denoising:
+  apply: true
+  kernel_size: [3, 3]
+resize:
+  target_size: [512, 512]
