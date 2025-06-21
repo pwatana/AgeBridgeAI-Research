@@ -505,5 +505,3 @@ if __name__ == "__main__":
 
     else:
         print("Invalid mode specified. Choose 'train_ra' or 'predict_ra'.")
-        and
-        
