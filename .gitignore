@@ -3,3 +3,4 @@
 *.csv
 __pycache__/
 *.pyc
+/Users/patriciawatanabe/Desktop/AgeBridgeAI-Research/models/laterality_identification/hand_laterality_model.h5
